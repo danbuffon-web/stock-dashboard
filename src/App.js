@@ -616,7 +616,7 @@ const StockDashboard = () => {
           <>
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-white mb-4">Strategy Backtesting</h2>
-              <p className="text-gray-300 mb-6">Test a simple RSI + 200MA strategy: Buy when RSI < 30 and price > 200MA. Sell when RSI > 70.</p>
+              <p className="text-gray-300 mb-6"> Test a simple RSI + 200MA strategy: Buy when RSI {"<"} 30 and price {">"} 200MA. Sell when RSI {">"} 70. </p>
               
               <div className="flex gap-3 flex-wrap">
                 {tickers.map((ticker) => (
