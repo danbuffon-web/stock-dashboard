@@ -273,6 +273,7 @@ const StockDashboard = () => {
   useEffect(() => {
     if (tickers.length > 0) {
      loadStocks();
+      }
   // eslint-disable-next-line
 }, []);
 
