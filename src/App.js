@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, Bar } from 'recharts';
-import { Search, TrendingUp, TrendingDown, AlertCircle, Loader, BarChart3, Zap, History } from 'lucide-react';
+import { Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, Bar } from 'recharts';
+import { Search, TrendingUp, TrendingDown, AlertCircle, Loader, Zap, History } from 'lucide-react';
 
 const StockDashboard = () => {
   const [tickers, setTickers] = useState(['AAPL']);
