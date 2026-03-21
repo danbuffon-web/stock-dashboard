@@ -272,9 +272,9 @@ const StockDashboard = () => {
 
   useEffect(() => {
     if (tickers.length > 0) {
-      loadStocks();
-    }
-  }, []);
+     loadStocks();
+  // eslint-disable-next-line
+}, []);
 
   const getBBSignal = (price, bb) => {
     if (!bb) return 'N/A';
