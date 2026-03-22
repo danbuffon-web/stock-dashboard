@@ -320,7 +320,6 @@ const StockDashboard = () => {
     setAnalysis('Analysis unavailable. Check your OpenAI backend configuration.');
   }
 };
-
     const summary = Object.entries(data)
       .map(
         ([ticker, info]) =>
