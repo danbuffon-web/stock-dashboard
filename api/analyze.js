@@ -1,0 +1,45 @@
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { summary } = req.body || {};
+
+  if (!summary) {
+    return res.status(400).json({ error: 'Missing summary' });
+  }
+
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Missing OPENAI_API_KEY' });
+  }
+
+  try {
+    const openaiRes = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-5.4',
+        input: `You are a stock market educator. Give a brief, balanced, educational analysis in 2-4 sentences based only on this data. Mention trend, momentum, and whether conditions look constructive, weak, or mixed. Do not give personalized financial advice.\n\n${summary}`,
+      }),
+    });
+
+    const data = await openaiRes.json();
+
+    if (!openaiRes.ok) {
+      return res.status(openaiRes.status).json({
+        error: data?.error?.message || 'OpenAI request failed',
+      });
+    }
+
+    return res.status(200).json({
+      analysis: data.output_text || 'Analysis unavailable.',
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Server error while generating analysis' });
+  }
+}
