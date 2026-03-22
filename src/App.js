@@ -35,8 +35,7 @@ const StockDashboard = () => {
   const [selectedTicker, setSelectedTicker] = useState('');
 
   const ALPHAVANTAGE_KEY = process.env.REACT_APP_ALPHAVANTAGE_KEY;
-  const CLAUDE_KEY = process.env.REACT_APP_CLAUDE_KEY;
-
+  
   const colors = ['#00D9FF', '#39FF14', '#FF6B9D', '#FFB347'];
 
   const fetchStockData = async (ticker) => {
