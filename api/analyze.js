@@ -1,56 +1,38 @@
+2026-03-22 15:47:31.232 [error] (node:4) Warning: Failed to load the ES module: /var/task/api/analyze.js. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:4) Warning: Failed to load the ES module: /var/task/api/analyze.js. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+/var/task/api/analyze.js:1
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+^^^^^^
 
-  const { summary } = req.body || {};
+SyntaxError: Unexpected token 'export'
+    at wrapSafe (node:internal/modules/cjs/loader:1692:18)
+    at Module._compile (node:internal/modules/cjs/loader:1735:20)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1300:12)
+    at /opt/rust/nodejs.js:2:13531
+    at Module.pn (/opt/rust/nodejs.js:2:13909)
+    at Xe.e.<computed>.Ye._load (/opt/rust/nodejs.js:2:13501)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+(node:4) Warning: Failed to load the ES module: /var/task/api/analyze.js. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:4) Warning: Failed to load the ES module: /var/task/api/analyze.js. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+/var/task/api/analyze.js:1
+export default async function handler(req, res) {
+^^^^^^
 
-  if (!summary) {
-    return res.status(400).json({ error: 'Missing summary' });
-  }
-
-  const apiKey = process.env.OPENAI_API_KEY;
-
-  if (!apiKey) {
-    return res.status(500).json({ error: 'Missing OPENAI_API_KEY' });
-  }
-
-  try {
-    const openaiRes = await fetch('https://api.openai.com/v1/responses', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1-mini',
-        input:
-          'You are a stock market educator. Give a brief, balanced, educational analysis in 2-4 sentences based only on this data. Mention trend, momentum, and whether conditions look constructive, weak, or mixed. Do not give personalized financial advice.\n\n' +
-          summary,
-      }),
-    });
-
-    const data = await openaiRes.json();
-
-    if (!openaiRes.ok) {
-      return res.status(openaiRes.status).json({
-        error: data?.error?.message || 'OpenAI request failed',
-        details: data,
-      });
-    }
-
-    const analysis =
-      data.output_text ||
-      data.output?.map((item) => item?.content?.map((c) => c?.text).join('')).join('\n') ||
-      'Analysis unavailable.';
-
-    return res.status(200).json({ analysis });
-  } catch (err) {
-    return res.status(500).json({
-      error: 'Server error while generating analysis',
-      details: err.message,
-    });
-  }
-}n({ error: 'Server error while generating analysis' });
-  }
-}
+SyntaxError: Unexpected token 'export'
+    at wrapSafe (node:internal/modules/cjs/loader:1692:18)
+    at Module._compile (node:internal/modules/cjs/loader:1735:20)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1300:12)
+    at /opt/rust/nodejs.js:2:13531
+    at Module.pn (/opt/rust/nodejs.js:2:13909)
+    at Xe.e.<computed>.Ye._load (/opt/rust/nodejs.js:2:13501)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
