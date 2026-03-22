@@ -44,7 +44,11 @@ if (data['Error Message']) {
       if (data['Note']) {
         throw new Error(`API rate limit reached. Please try again in a few minutes. Free tier: 5 requests/min, 100/day`);
       }
+      if (!data['Time Series (Daily)']) {
+        throw new Error(`Unexpected API response: ${JSON.stringify(data).slice(0, 200)}`);
+      }
 
+      
       const timeSeries = data['Time Series (Daily)'] || {};
       const dates = Object.keys(timeSeries).slice(0, 100).reverse();
       
