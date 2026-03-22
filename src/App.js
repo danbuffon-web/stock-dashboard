@@ -971,7 +971,7 @@ const generateAnalysis = async (data) => {
 const MetricRow = ({ label, value, tooltip }) => (
   <div className="flex justify-between items-center text-sm">
     <span className="text-gray-300 cursor-help" title={tooltip}>
-      {label}
+      {label}:
     </span>
     <span className="text-cyan-200 font-semibold text-right ml-3">{value}</span>
   </div>
