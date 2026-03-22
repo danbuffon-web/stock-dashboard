@@ -24,7 +24,9 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'gpt-5.4',
-        input: `You are a stock market educator. Give a brief, balanced, educational analysis in 2-4 sentences based only on this data. Mention trend, momentum, and whether conditions look constructive, weak, or mixed. Do not give personalized financial advice.\n\n${summary}`,
+        input:
+          'You are a stock market educator. Give a brief, balanced, educational analysis in 2-4 sentences based only on this data. Mention trend, momentum, and whether conditions look constructive, weak, or mixed. Do not give personalized financial advice.\n\n' +
+          summary,
       }),
     });
 
@@ -33,13 +35,22 @@ export default async function handler(req, res) {
     if (!openaiRes.ok) {
       return res.status(openaiRes.status).json({
         error: data?.error?.message || 'OpenAI request failed',
+        details: data,
       });
     }
 
-    return res.status(200).json({
-      analysis: data.output_text || 'Analysis unavailable.',
-    });
+    const analysis =
+      data.output_text ||
+      data.output?.map((item) => item?.content?.map((c) => c?.text).join('')).join('\n') ||
+      'Analysis unavailable.';
+
+    return res.status(200).json({ analysis });
   } catch (err) {
-    return res.status(500).json({ error: 'Server error while generating analysis' });
+    return res.status(500).json({
+      error: 'Server error while generating analysis',
+      details: err.message,
+    });
+  }
+}n({ error: 'Server error while generating analysis' });
   }
 }
