@@ -295,12 +295,31 @@ const StockDashboard = () => {
   };
 
   const generateAnalysis = async (data) => {
-    if (!CLAUDE_KEY) {
-      setAnalysis(
-        'AI analysis not available. Add REACT_APP_CLAUDE_KEY to environment variables to enable it.'
-      );
-      return;
+  const summary = Object.entries(data)
+    .map(
+      ([ticker, info]) =>
+        `${ticker}: $${info.currentPrice}, RSI: ${info.rsi}, 200MA: ${info.ma200}, 50MA: ${info.ma50}, MACD: ${info.macd.macd}`
+    )
+    .join(' | ');
+
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ summary }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Analysis unavailable');
     }
+
+    setAnalysis(result.analysis || 'Analysis unavailable.');
+  } catch (err) {
+    setAnalysis('Analysis unavailable. Check your OpenAI backend configuration.');
+  }
+};
 
     const summary = Object.entries(data)
       .map(
