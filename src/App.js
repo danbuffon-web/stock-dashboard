@@ -15,7 +15,7 @@ const StockDashboard = () => {
   const [selectedTicker, setSelectedTicker] = useState('');
 
   // API Keys from environment variables
-  const ALPHAVANTAGE_KEY = process.env.REACT_APP_ALPHAVANTAGE_KEY || 'demo';
+  const ALPHAVANTAGE_KEY = process.env.REACT_APP_ALPHAVANTAGE_KEY;
   const CLAUDE_KEY = process.env.REACT_APP_CLAUDE_KEY;
 
   // Color scheme for up to 4 tickers
