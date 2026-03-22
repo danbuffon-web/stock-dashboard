@@ -40,7 +40,21 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const analysis = data.output_text || 'Analysis unavailable.';
+    let analysis = data.output_text;
+
+if (!analysis && data.output) {
+  try {
+    analysis = data.output
+      .map(o => o.content?.map(c => c.text).join(''))
+      .join('\n');
+  } catch {
+    analysis = null;
+  }
+}
+
+if (!analysis) {
+  analysis = 'Analysis unavailable.';
+}
 
     return res.status(200).json({ analysis });
   } catch (err) {
