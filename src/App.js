@@ -294,7 +294,7 @@ const StockDashboard = () => {
     setLoading(false);
   };
 
-  const generateAnalysis = async (data) => {
+const generateAnalysis = async (data) => {
   const summary = Object.entries(data)
     .map(
       ([ticker, info]) =>
@@ -303,6 +303,8 @@ const StockDashboard = () => {
     .join(' | ');
 
   try {
+    setAnalysis('Generating AI analysis...');
+
     const response = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -312,12 +314,12 @@ const StockDashboard = () => {
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.error || 'Analysis unavailable');
+      throw new Error(result.error || result.details || 'Analysis unavailable');
     }
 
     setAnalysis(result.analysis || 'Analysis unavailable.');
   } catch (err) {
-    setAnalysis('Analysis unavailable. Check your OpenAI backend configuration.');
+    setAnalysis(`AI analysis unavailable: ${err.message}`);
   }
 };
     
