@@ -181,27 +181,32 @@ const StockDashboard = () => {
     };
   };
 
-  const performBacktest = (ticker) => {
-    const data = stockData[ticker];
-    if (!data) return;
+const performBacktest = (ticker) => {
+  const data = stockData[ticker];
+  if (!data) return;
 
-    let trades = [];
-    let position = null;
-    let cash = 10000;
-    let shares = 0;
+  let trades = [];
+  let position = null;
+  let cash = 10000;
+  let shares = 0;
 
-    const prices = data.prices;
-    const dates = data.dates;
+  const prices = data.prices;
+  const dates = data.dates;
 
-    for (let i = 20; i < prices.length; i++) {
-      const rsi = calculateRSI(prices.slice(0, i + 1));
-      const ma200 = calculateMA(prices.slice(0, i + 1), 200);
-      const price = prices[i];
+  // Use 200MA if enough history exists, otherwise fall back to 50MA
+  const maPeriod = prices.length >= 200 ? 200 : 50;
 
-      if (!ma200) continue;
+  for (let i = maPeriod; i < prices.length; i++) {
+    const rsi = calculateRSI(prices.slice(0, i + 1));
+    const movingAverage = calculateMA(prices.slice(0, i + 1), maPeriod);
+    const price = prices[i];
 
-      if (!position && rsi < 30 && price > ma200) {
-        shares = Math.floor(cash / price);
+    if (!movingAverage) continue;
+
+    if (!position && rsi < 30 && price > movingAverage) {
+      shares = Math.floor(cash / price);
+
+      if (shares > 0) {
         cash -= shares * price;
         position = {
           type: 'buy',
@@ -210,34 +215,38 @@ const StockDashboard = () => {
           shares,
         };
         trades.push(position);
-      } else if (position && rsi > 70) {
-        cash += shares * price;
-        trades.push({
-          type: 'sell',
-          date: dates[i],
-          price,
-          profit: (price - position.price) * shares,
-          profitPercent: (((price - position.price) / position.price) * 100).toFixed(2),
-        });
-        position = null;
-        shares = 0;
       }
+    } else if (position && rsi > 70) {
+      cash += shares * price;
+
+      trades.push({
+        type: 'sell',
+        date: dates[i],
+        price,
+        profit: (price - position.price) * shares,
+        profitPercent: (((price - position.price) / position.price) * 100).toFixed(2),
+      });
+
+      position = null;
+      shares = 0;
     }
+  }
 
-    const finalValue = cash + shares * prices[prices.length - 1];
-    const sellTrades = trades.filter((t) => t.type === 'sell');
-    const winningTrades = sellTrades.filter(
-      (t) => parseFloat(t.profitPercent) > 0
-    );
+  const finalValue = cash + shares * prices[prices.length - 1];
+  const sellTrades = trades.filter((t) => t.type === 'sell');
+  const winningTrades = sellTrades.filter(
+    (t) => parseFloat(t.profitPercent) > 0
+  );
 
-    setBacktestResults({
-      ticker,
-      trades,
-      finalValue: finalValue.toFixed(2),
-      totalReturn: (((finalValue - 10000) / 10000) * 100).toFixed(2),
-      winRate: (winningTrades.length / (sellTrades.length || 1)) * 100,
-    });
-  };
+  setBacktestResults({
+    ticker,
+    trades,
+    finalValue: finalValue.toFixed(2),
+    totalReturn: (((finalValue - 10000) / 10000) * 100).toFixed(2),
+    winRate: (winningTrades.length / (sellTrades.length || 1)) * 100,
+    strategyLabel: `RSI + ${maPeriod}MA`,
+  });
+};
 
   const addTicker = () => {
     const next = inputValue.trim().toUpperCase();
