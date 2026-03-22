@@ -25,7 +25,7 @@ const StockDashboard = () => {
   const fetchStockData = async (ticker) => {
     try {
       const response = await fetch(
-        `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${ALPHAVANTAGE_KEY}&outputsize=full`
+        `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${ALPHAVANTAGE_KEY}&outputsize=compact`
       );
       const data = await response.json();
 
