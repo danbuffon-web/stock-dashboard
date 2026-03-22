@@ -23,7 +23,7 @@ export default async function handler(req, res) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-5.4',
+        model: 'gpt-4.1-mini',
         input:
           'You are a stock market educator. Give a brief, balanced, educational analysis in 2-4 sentences based only on this data. Mention trend, momentum, and whether conditions look constructive, weak, or mixed. Do not give personalized financial advice.\n\n' +
           summary,
