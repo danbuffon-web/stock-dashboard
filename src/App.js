@@ -859,9 +859,9 @@ const generateAnalysis = async (data) => {
                 Strategy Backtesting
               </h2>
               <p className="text-gray-200 mb-6">
-                Test a simple RSI + 200MA strategy: Buy when RSI {'<'} 30 and price {'>'}{' '}
-                200MA. Sell when RSI {'>'} 70.
-              </p>
+               Test a simple RSI + moving average strategy: Buy when RSI {'<'} 30 and price is above the trend average. Sell when RSI {'>'} 70.
+               The app uses 200MA when enough history is available, otherwise it falls back to 50MA.
+               </p>
 
               <div className="flex gap-3 flex-wrap">
                 {tickers.map((ticker) => (
