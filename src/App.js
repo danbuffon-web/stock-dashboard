@@ -320,45 +320,7 @@ const StockDashboard = () => {
     setAnalysis('Analysis unavailable. Check your OpenAI backend configuration.');
   }
 };
-    const summary = Object.entries(data)
-      .map(
-        ([ticker, info]) =>
-          `${ticker}: $${info.currentPrice}, RSI: ${info.rsi}, 200MA: ${info.ma200}, MACD: ${info.macd.macd}`
-      )
-      .join(' | ');
-
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': CLAUDE_KEY,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 500,
-          messages: [
-            {
-              role: 'user',
-              content: `As a stock educator, provide a brief analysis (2-3 sentences) for educational purposes on these stocks: ${summary}. Include observations about momentum (RSI), trend (200MA/50MA), MACD signals, and whether it appears to be at a potential entry point. Keep it educational and suitable for teaching.`,
-            },
-          ],
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.content && result.content[0]) {
-        setAnalysis(result.content[0].text);
-      } else {
-        setAnalysis('Analysis unavailable. Claude did not return usable content.');
-      }
-    } catch (err) {
-      setAnalysis('Analysis unavailable. Check your Claude API key configuration.');
-    }
-  };
-
+    
   useEffect(() => {
     if (tickers.length > 0) {
       loadStocks();
