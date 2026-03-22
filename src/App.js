@@ -878,9 +878,12 @@ const generateAnalysis = async (data) => {
 
             {backtestResults && (
               <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 border border-cyan-500/20 rounded-xl p-6 backdrop-blur-sm">
-                <h3 className="text-xl font-bold text-white mb-6">
-                  {backtestResults.ticker} - Strategy Results
-                </h3>
+                <h3 className="text-xl font-bold text-white mb-2">
+  {backtestResults.ticker} - Strategy Results
+</h3>
+<p className="text-gray-300 mb-6">
+  Strategy used: {backtestResults.strategyLabel}
+</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                   <div className="bg-slate-900/50 p-4 rounded-lg">
