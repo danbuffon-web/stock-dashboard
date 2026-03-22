@@ -28,8 +28,16 @@ const StockDashboard = () => {
         `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${ALPHAVANTAGE_KEY}&outputsize=full`
       );
       const data = await response.json();
-      
-      if (data['Error Message']) {
+
+console.log("Alpha key present:", !!ALPHAVANTAGE_KEY);
+console.log("Alpha key prefix:", ALPHAVANTAGE_KEY ? ALPHAVANTAGE_KEY.slice(0, 4) : "missing");
+console.log("Alpha response:", data);
+
+if (!ALPHAVANTAGE_KEY) {
+  throw new Error("Missing Alpha Vantage API key");
+}
+
+if (data['Error Message']) {
         throw new Error(`Ticker "${ticker}" not found`);
       }
 
