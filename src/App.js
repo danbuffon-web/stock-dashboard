@@ -983,10 +983,17 @@ const generateAnalysis = async (data) => {
               <h2 className="text-2xl font-bold text-white mb-4">
                 Strategy Backtesting
               </h2>
-              <p className="text-gray-200 mb-6">
-               Test a simple RSI + moving average strategy: Buy when RSI {'<'} 30 and price is above the trend average. Sell when RSI {'>'} 70.
-               The app uses 200MA when enough history is available, otherwise it falls back to 50MA.
-               </p>
+             <p className="text-gray-200 mb-6">
+  Explore three established trading approaches:
+  <br />
+  • <strong>Trend Following:</strong> Focuses on stocks maintaining strength above key averages.
+  <br />
+  • <strong>Pullback in Uptrend:</strong> Looks for controlled dips within strong trends.
+  <br />
+  • <strong>Breakout Momentum:</strong> Identifies stocks pushing to new highs with strength.
+  <br /><br />
+  The backtest automatically adapts to available data (using 200MA when possible, otherwise 50MA).
+</p>
 
               <div className="flex gap-3 flex-wrap">
                 {tickers.map((ticker) => (
