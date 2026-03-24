@@ -755,7 +755,9 @@ Fits ${strategyName}: ${fitsStrategy}`;
                 <h2 className="text-lg font-bold text-cyan-200 mb-3 flex items-center gap-2">
                   <AlertCircle size={20} /> Educational Analysis
                 </h2>
-                <p className="text-gray-200 leading-relaxed text-sm">{analysis}</p>
+                <div className="text-gray-200 leading-relaxed text-sm whitespace-pre-line">
+  {analysis}
+</div>
                 <p className="text-gray-400 text-xs mt-4 italic">
                   *This analysis is for educational purposes. Always conduct your own
                   research before investing.
