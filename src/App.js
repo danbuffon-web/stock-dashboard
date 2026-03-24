@@ -571,7 +571,9 @@ const generateAnalysis = async (data) => {
                   : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
               }`}
             >
-              {Object.entries(stockData).map(([ticker, data], idx) => (
+              {Object.entries(stockData)
+  .filter(([_, data]) => passesStrategyScreen(data, selectedStrategy))
+  .map(([ticker, data], idx) => (
                 <div
                   key={ticker}
                   className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-cyan-500/20 rounded-xl p-6 backdrop-blur-sm hover:border-cyan-400/40 transition cursor-pointer"
