@@ -250,7 +250,18 @@ const passesStrategyScreen = (data, strategy) => {
 
 const performBacktest = (ticker) => {
   const data = stockData[ticker];
-  if (!data) return;
+  if (!data || !data.prices || data.prices.length < 60) {
+    setBacktestResults({
+      ticker,
+      trades: [],
+      finalValue: '10000.00',
+      totalReturn: '0.00',
+      winRate: 0,
+      strategyLabel: 'Not enough data',
+      note: 'Not enough historical data to run a meaningful backtest.',
+    });
+    return;
+  }
 
   let trades = [];
   let position = null;
@@ -259,33 +270,62 @@ const performBacktest = (ticker) => {
 
   const prices = data.prices;
   const dates = data.dates;
+  const volumes = data.volumes || [];
 
-  // Use 200MA if enough history exists, otherwise fall back to 50MA
   const maPeriod = prices.length >= 200 ? 200 : 50;
 
-  for (let i = maPeriod; i < prices.length; i++) {
-    const rsi = calculateRSI(prices.slice(0, i + 1));
-    const movingAverage = calculateMA(prices.slice(0, i + 1), maPeriod);
+  const strategyLabel =
+    selectedStrategy === 'trend'
+      ? `Trend Following (${maPeriod}MA)`
+      : selectedStrategy === 'pullback'
+      ? `Pullback in Uptrend (${maPeriod}MA)`
+      : 'Breakout Momentum';
+
+  for (let i = Math.max(60, maPeriod); i < prices.length; i++) {
+    const priceHistory = prices.slice(0, i + 1);
     const price = prices[i];
+    const rsi = calculateRSI(priceHistory, 14);
+    const ma50 = calculateMA(priceHistory, 50);
+    const ma200 = prices.length >= 200 ? calculateMA(priceHistory, 200) : null;
+    const trendMA = ma200 || ma50;
 
-    if (!movingAverage) continue;
+    let buySignal = false;
+    let sellSignal = false;
 
-    if (!position && rsi < 30 && price > movingAverage) {
+    if (selectedStrategy === 'trend') {
+      buySignal = price > ma50 && (!ma200 || price > ma200) && rsi > 45 && rsi < 65;
+      sellSignal = price < ma50 || rsi > 75;
+    }
+
+    if (selectedStrategy === 'pullback') {
+      buySignal = price > trendMA && price > ma50 && rsi >= 35 && rsi <= 50;
+      sellSignal = price < ma50 || rsi > 65;
+    }
+
+    if (selectedStrategy === 'breakout') {
+      const recentHigh = Math.max(...prices.slice(Math.max(0, i - 59), i));
+      const currentVolume = volumes[i];
+      const avgVolume =
+        i >= 20 ? volumes.slice(i - 19, i + 1).reduce((a, b) => a + b, 0) / 20 : null;
+
+      buySignal =
+        price > recentHigh &&
+        price > ma50 &&
+        rsi > 55 &&
+        (!avgVolume || !currentVolume || currentVolume > avgVolume);
+
+      sellSignal = price < recentHigh || rsi > 75;
+    }
+
+    if (!position && buySignal) {
       shares = Math.floor(cash / price);
-
       if (shares > 0) {
         cash -= shares * price;
-        position = {
-          type: 'buy',
-          date: dates[i],
-          price,
-          shares,
-        };
+        position = { type: 'buy', date: dates[i], price, shares };
         trades.push(position);
       }
-    } else if (position && rsi > 70) {
+    } else if (position && sellSignal) {
       cash += shares * price;
-
       trades.push({
         type: 'sell',
         date: dates[i],
@@ -293,7 +333,6 @@ const performBacktest = (ticker) => {
         profit: (price - position.price) * shares,
         profitPercent: (((price - position.price) / position.price) * 100).toFixed(2),
       });
-
       position = null;
       shares = 0;
     }
@@ -301,17 +340,19 @@ const performBacktest = (ticker) => {
 
   const finalValue = cash + shares * prices[prices.length - 1];
   const sellTrades = trades.filter((t) => t.type === 'sell');
-  const winningTrades = sellTrades.filter(
-    (t) => parseFloat(t.profitPercent) > 0
-  );
+  const winningTrades = sellTrades.filter((t) => parseFloat(t.profitPercent) > 0);
 
   setBacktestResults({
     ticker,
     trades,
     finalValue: finalValue.toFixed(2),
     totalReturn: (((finalValue - 10000) / 10000) * 100).toFixed(2),
-    winRate: (winningTrades.length / (sellTrades.length || 1)) * 100,
-    strategyLabel: `RSI + ${maPeriod}MA`,
+    winRate: sellTrades.length ? (winningTrades.length / sellTrades.length) * 100 : 0,
+    strategyLabel,
+    note:
+      trades.length === 0
+        ? `No trades triggered for ${strategyLabel}.`
+        : '',
   });
 };
 
