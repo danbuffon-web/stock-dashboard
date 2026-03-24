@@ -26,8 +26,21 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({
         model: 'gpt-4.1-mini',
         input:
-          'You are a stock market educator. Give a brief, balanced, educational analysis in 2-4 sentences based only on this data. Mention trend, momentum, and whether conditions look constructive, weak, or mixed. Do not give personalized financial advice.\n\n' +
-          summary,
+  'You are a stock market educator helping adults understand investment decisions. Based only on the stock data below, write a concise educational analysis.\n\n' +
+  'Instructions:\n' +
+  '- Use plain English.\n' +
+  '- Explain whether each stock fits the selected strategy.\n' +
+  '- Mention trend, momentum, and any caution flags.\n' +
+  '- Do not give personalized financial advice.\n' +
+  '- Keep the tone analytical and educational.\n' +
+  '- Format the response in short sections.\n\n' +
+  'For each stock, use this structure:\n' +
+  '1. Ticker name\n' +
+  '2. Strategy fit: Strong / Moderate / Weak\n' +
+  '3. Trend and momentum explanation\n' +
+  '4. Risk or caution\n' +
+  '5. Educational takeaway\n\n' +
+  summary,
       }),
     });
 
