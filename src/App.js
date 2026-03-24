@@ -39,6 +39,25 @@ const StockDashboard = () => {
   
   const colors = ['#00D9FF', '#39FF14', '#FF6B9D', '#FFB347'];
 
+const fetchSMA = async (ticker, period = 200) => {
+  try {
+    const response = await fetch(
+      `https://www.alphavantage.co/query?function=SMA&symbol=${ticker}&interval=daily&time_period=${period}&series_type=close&apikey=${ALPHAVANTAGE_KEY}`
+    );
+
+    const data = await response.json();
+
+    if (!data['Technical Analysis: SMA']) return null;
+
+    const values = Object.values(data['Technical Analysis: SMA']);
+    const latest = values[0];
+
+    return parseFloat(latest['SMA']);
+  } catch {
+    return null;
+  }
+};
+  
   const fetchStockData = async (ticker) => {
     try {
       if (!ALPHAVANTAGE_KEY) {
@@ -89,12 +108,14 @@ const StockDashboard = () => {
         previousPrice
           ? ((currentPrice - previousPrice) / previousPrice) * 100
           : 0;
-
+      const ma200FromAPI = await fetchSMA(ticker, 200);
       return {
         ticker,
         currentPrice: currentPrice.toFixed(2),
         dayChange: dayChange.toFixed(2),
-        ma200: ma200 ? ma200.toFixed(2) : 'Unavailable on compact data',
+        ma200: ma200FromAPI
+  ? ma200FromAPI.toFixed(2)
+  : (ma200 ? ma200.toFixed(2) : 'Unavailable'),
         ma50: ma50 ? ma50.toFixed(2) : 'N/A',
         rsi: rsi.toFixed(2),
         macd,
