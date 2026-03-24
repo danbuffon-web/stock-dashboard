@@ -1010,6 +1010,12 @@ const generateAnalysis = async (data) => {
   Strategy used: {backtestResults.strategyLabel}
 </p>
 
+{backtestResults.note && (
+  <p className="text-yellow-300 mb-6">
+    {backtestResults.note}
+  </p>
+)}
+  
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                   <div className="bg-slate-900/50 p-4 rounded-lg">
                     <p className="text-gray-300 text-sm mb-1">Starting Capital</p>
