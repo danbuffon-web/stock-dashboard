@@ -437,7 +437,7 @@ Fits ${strategyName}: ${fitsStrategy}`;
   })
   .join('\n\n');
   try {
-    setAnalysis('Generating AI analysis...');
+    setAnalysis('Generating strategy-aware AI analysis...');
 
     const response = await fetch('/api/analyze', {
       method: 'POST',
