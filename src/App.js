@@ -24,6 +24,7 @@ import {
 
 const StockDashboard = () => {
   const [tickers, setTickers] = useState(['AAPL']);
+  const [selectedStrategy, setSelectedStrategy] = useState('trend');
   const [inputValue, setInputValue] = useState('');
   const [stockData, setStockData] = useState({});
   const [chartData, setChartData] = useState([]);
@@ -180,6 +181,72 @@ const StockDashboard = () => {
       lower: (sma - std * stdDev).toFixed(2),
     };
   };
+
+  const isNearRecentHigh = (prices, lookback = 60, threshold = 0.97) => {
+  if (!prices || prices.length < lookback) return false;
+  const recent = prices.slice(-lookback);
+  const recentHigh = Math.max(...recent);
+  const currentPrice = prices[prices.length - 1];
+  return currentPrice >= recentHigh * threshold;
+};
+
+const isNearMA = (price, ma, threshold = 0.03) => {
+  if (!ma || ma === 'N/A' || ma === 'Unavailable on compact data') return false;
+  return Math.abs(price - parseFloat(ma)) / parseFloat(ma) <= threshold;
+};
+
+const passesStrategyScreen = (data, strategy) => {
+  const price = parseFloat(data.currentPrice);
+  const rsi = parseFloat(data.rsi);
+  const ma50 = data.ma50 !== 'N/A' ? parseFloat(data.ma50) : null;
+  const ma200 =
+    data.ma200 !== 'Unavailable on compact data' && data.ma200 !== 'N/A'
+      ? parseFloat(data.ma200)
+      : null;
+
+  const avgVolume =
+    data.volumes && data.volumes.length >= 20
+      ? data.volumes.slice(-20).reduce((a, b) => a + b, 0) / 20
+      : null;
+
+  const currentVolume =
+    data.volumes && data.volumes.length
+      ? data.volumes[data.volumes.length - 1]
+      : null;
+
+  if (strategy === 'trend') {
+    return (
+      ma50 &&
+      price > ma50 &&
+      rsi >= 45 &&
+      rsi <= 70 &&
+      (!ma200 || price > ma200)
+    );
+  }
+
+  if (strategy === 'pullback') {
+    return (
+      ma50 &&
+      price > ma50 &&
+      rsi >= 35 &&
+      rsi <= 50 &&
+      isNearMA(price, data.ma50, 0.03) &&
+      (!ma200 || price > ma200)
+    );
+  }
+
+  if (strategy === 'breakout') {
+    return (
+      ma50 &&
+      price > ma50 &&
+      rsi > 55 &&
+      isNearRecentHigh(data.prices, 60, 0.98) &&
+      (!avgVolume || !currentVolume || currentVolume > avgVolume)
+    );
+  }
+
+  return true;
+};
 
 const performBacktest = (ticker) => {
   const data = stockData[ticker];
@@ -410,6 +477,21 @@ const generateAnalysis = async (data) => {
               Fetching market data...
             </div>
           )}
+
+<div className="mb-6">
+  <label className="block text-gray-300 mb-2 font-semibold">
+    Teaching Strategy
+  </label>
+  <select
+    value={selectedStrategy}
+    onChange={(e) => setSelectedStrategy(e.target.value)}
+    className="px-4 py-3 bg-slate-900/50 border border-cyan-500/30 rounded-lg text-white"
+  >
+    <option value="trend">Trend Following</option>
+    <option value="pullback">Pullback in Uptrend</option>
+    <option value="breakout">Breakout Momentum</option>
+  </select>
+</div>
 
           <div className="flex flex-wrap gap-2">
             {tickers.map((ticker) => (
