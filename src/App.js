@@ -412,13 +412,30 @@ const performBacktest = (ticker) => {
   };
 
 const generateAnalysis = async (data) => {
-  const summary = Object.entries(data)
-    .map(
-      ([ticker, info]) =>
-        `${ticker}: $${info.currentPrice}, RSI: ${info.rsi}, 200MA: ${info.ma200}, 50MA: ${info.ma50}, MACD: ${info.macd.macd}`
-    )
-    .join(' | ');
+  const strategyName =
+  selectedStrategy === 'trend'
+    ? 'Trend Following'
+    : selectedStrategy === 'pullback'
+    ? 'Pullback in Uptrend'
+    : 'Breakout Momentum';
 
+const summary = Object.entries(data)
+  .map(([ticker, info]) => {
+    const fitsStrategy = passesStrategyScreen(info, selectedStrategy) ? 'Yes' : 'No';
+    const bbSignal = getBBSignal(parseFloat(info.currentPrice), info.bollingerBands);
+    const macdSignal = getMACDSignal(info.macd);
+
+    return `${ticker}
+Price: ${info.currentPrice}
+RSI: ${info.rsi}
+50MA: ${info.ma50}
+200MA: ${info.ma200}
+MACD: ${macdSignal}
+Bollinger Bands: ${bbSignal}
+Daily Change: ${info.dayChange}%
+Fits ${strategyName}: ${fitsStrategy}`;
+  })
+  .join('\n\n');
   try {
     setAnalysis('Generating AI analysis...');
 
